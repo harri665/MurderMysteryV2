@@ -3,10 +3,10 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "dev": "concurrently \"fastapi dev server/backend/server.py\" \"npm run dev --prefix client\"",
     "client": "npm run dev --prefix client",
-    "server": "npm run dev --prefix server",
-    "install:all": "concurrently \"npm install --prefix client\" \"npm install --prefix server\""
+    "server": "fastapi dev server/backend/server.py",
+    "install:all": "concurrently \"npm install --prefix client\""
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
