@@ -85,3 +85,9 @@ PORT: #port number here
 - `npm start` - Start server in production mode
 
 
+
+
+### Building to Native: 
+1. `cd client`
+2. `npm run build`
+3. `npx cap sync` 

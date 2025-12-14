@@ -1,0 +1,82 @@
+name: Build and Push Native Folders
+
+on:
+  push:
+    branches:
+      - main  # Change this to your default branch if different
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all branches
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.14.0'  # Specify the Node.js version you need
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      
+      - name: Install root dependencies
+        run: npm install
+      
+      - name: Install client dependencies
+        run: |
+          cd client
+          npm install
+      
+      - name: Build client
+        run: |
+          cd client
+          npm run build
+      
+      - name: Add Capacitor platforms
+        run: |
+          cd client
+          npx cap add android || true
+          npx cap add ios || true
+      
+      - name: Sync Capacitor
+        run: |
+          cd client
+          npx cap sync
+      
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+      
+      - name: Create and push to native branch
+        run: |
+          # Copy android and ios folders to temp location
+          cp -r client/android /tmp/android
+          cp -r client/ios /tmp/ios
+          
+          # Create a new branch or switch to existing one
+          git checkout -B native-builds || git checkout native-builds
+          
+          # Remove everything except .git
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          
+          # Copy android and ios folders from temp to root
+          cp -r /tmp/android ./android
+          cp -r /tmp/ios ./ios
+          
+          # Stage all changes
+          git add -A
+          
+          # Commit if there are changes
+          git diff-index --quiet HEAD || git commit -m "Update native builds - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          
+          # Push to native-builds branch
+          git push origin native-builds --force
