@@ -3,14 +3,14 @@ services:
     build:
       context: ./Src/server
       dockerfile: Dockerfile
-    container_name: harwood-server
+    container_name: MurderMysteryV2-server
     ports:
       - "3001:3001"
     environment:
       - NODE_ENV=production
       - PORT=3001
     networks:
-      - harwood-network
+      - MurderMysteryV2-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/api/health"]
@@ -23,15 +23,15 @@ services:
     build:
       context: ./Src/client
       dockerfile: Dockerfile
-    container_name: harwood-client
+    container_name: MurderMysteryV2-client
     ports:
       - "80:80"
     depends_on:
       - server
     networks:
-      - harwood-network
+      - MurderMysteryV2-network
     restart: unless-stopped
 
 networks:
-  harwood-network:
+  MurderMysteryV2-network:
     driver: bridge
