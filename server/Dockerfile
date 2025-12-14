@@ -1,17 +1,13 @@
-FROM node:18-alpine
+FROM python:3.9
 
-WORKDIR /app
+WORKDIR /src
 
-# Copy package files
-COPY package*.json ./
+COPY ./requirements.txt /src/requirements.txt
 
-# Install production dependencies only
-RUN npm ci --only=production
+RUN pip install --no-cache-dir --upgrade -r /src/requirements.txt
 
-# Copy source code
-COPY . .
+COPY ./backend /src/backend
 
 EXPOSE 3001
 
-# Use node directly (no nodemon in production)
-CMD ["node", "index.js"]
+CMD ["uvicorn" "backend.server:app", "--host", "0.0.0.0", "--port", "3001"]
