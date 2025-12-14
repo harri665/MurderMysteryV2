@@ -1,0 +1,68 @@
+name: Build and Push Native Folders
+
+on:
+  push:
+    branches:
+      - main  # Change this to your default branch if different
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all branches
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      
+      - name: Install root dependencies
+        run: npm install
+      
+      - name: Install client dependencies
+        run: |
+          cd client
+          npm install
+      
+      - name: Build client
+        run: |
+          cd client
+          npm run build
+      
+      - name: Sync Capacitor
+        run: |
+          cd client
+          npx cap sync
+      
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+      
+      - name: Create and push to native branch
+        run: |
+          # Create a new branch or switch to existing one
+          git checkout -B native-builds || git checkout native-builds
+          
+          # Remove everything except .git, android, and ios folders
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name 'android' ! -name 'ios' -exec rm -rf {} +
+          
+          # Copy android and ios folders from client to root
+          cp -r client/android ./android
+          cp -r client/ios ./ios
+          
+          # Stage all changes
+          git add -A
+          
+          # Commit if there are changes
+          git diff-index --quiet HEAD || git commit -m "Update native builds - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          
+          # Push to native-builds branch
+          git push origin native-builds --force
