@@ -54,15 +54,19 @@ jobs:
       
       - name: Create and push to native branch
         run: |
+          # Copy android and ios folders to temp location
+          cp -r client/android /tmp/android
+          cp -r client/ios /tmp/ios
+          
           # Create a new branch or switch to existing one
           git checkout -B native-builds || git checkout native-builds
           
-          # Remove everything except .git, android, and ios folders
-          find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name 'android' ! -name 'ios' -exec rm -rf {} +
+          # Remove everything except .git
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
           
-          # Copy android and ios folders from client to root
-          cp -r client/android ./android
-          cp -r client/ios ./ios
+          # Copy android and ios folders from temp to root
+          cp -r /tmp/android ./android
+          cp -r /tmp/ios ./ios
           
           # Stage all changes
           git add -A
