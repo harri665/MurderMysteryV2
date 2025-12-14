@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MuderMysteryV2</string>
+    <string name="title_activity_main">MuderMysteryV2</string>
+    <string name="package_name">com.harrison_martin.murdermysteryv2</string>
+    <string name="custom_url_scheme">com.harrison_martin.murdermysteryv2</string>
+</resources>
