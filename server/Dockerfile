@@ -10,4 +10,4 @@ COPY ./backend /src/backend
 
 EXPOSE 3001
 
-CMD ["uvicorn" "backend.server:app", "--host", "0.0.0.0", "--port", "3001"]
+CMD ["uvicorn", "backend.server:app", "--host", "0.0.0.0", "--port", "3001"]
